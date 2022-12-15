@@ -1,6 +1,6 @@
 # unleash-client-haskell-core
 
-This is the core functionality for an [Unleash](https://www.getunleash.io/) Haskell client. It currently meets all [client specificions per v4.2.2](https://github.com/Unleash/client-specification/releases/tag/v4.2.2) and exports:
+This is the core functionality for an [Unleash](https://www.getunleash.io/) Haskell client. It currently meets all [client specifications per v4.2.2](https://github.com/Unleash/client-specification/releases/tag/v4.2.2) and exports:
 
 - `Unleash`: Data structures and functions for getting features and variants.
 - `Unleash.HttpClient`: HTTP client for interacting with an Unleash server.
