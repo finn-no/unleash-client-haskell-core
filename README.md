@@ -50,4 +50,4 @@ cabal test
 
 - [ ] Create an `unleash-client-haskell-example`.
 
-- [ ] FOSS it and add to Hackage and Unleash docs.
+- [ ] Add project to Hackage and Unleash docs.
