@@ -16,7 +16,7 @@
           pkgs.haskellPackages.callCabal2nix "unleash-client-haskell-core" ./.
           { };
       in {
-        defaultPackage = uchc;
+        defaultPackage = uchc; # nix build .?submodules=1
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
             cabal-install
