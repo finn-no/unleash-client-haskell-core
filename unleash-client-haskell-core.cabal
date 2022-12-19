@@ -66,6 +66,12 @@ test-suite unleash-client-haskell-core-test
     type: exitcode-stdio-1.0
     main-is: Spec.hs
     hs-source-dirs: test
+    other-modules:
+        UnleashClientSpecificationRoundtripSpec
+        UnleashHttpClientSpec
+        UnleashSpecificationJsonTypes
+        UnleashSpecificationSpec
+        VersionSpec
     build-depends:
         unleash-client-haskell-core,
         aeson,

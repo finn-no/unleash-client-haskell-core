@@ -1,0 +1,31 @@
+cradle:
+  cabal:
+    - path: "test/Spec.hs"
+      component: "unleash-client-haskell-core:test:unleash-client-haskell-core-test"
+
+    - path: "test/UnleashClientSpecificationRoundtripSpec.hs"
+      component: "unleash-client-haskell-core:test:unleash-client-haskell-core-test"
+
+    - path: "test/UnleashHttpClientSpec.hs"
+      component: "unleash-client-haskell-core:test:unleash-client-haskell-core-test"
+
+    - path: "test/UnleashSpecificationJsonTypes.hs"
+      component: "unleash-client-haskell-core:test:unleash-client-haskell-core-test"
+
+    - path: "test/UnleashSpecificationSpec.hs"
+      component: "unleash-client-haskell-core:test:unleash-client-haskell-core-test"
+
+    - path: "test/VersionSpec.hs"
+      component: "unleash-client-haskell-core:test:unleash-client-haskell-core-test"
+
+    - path: "src/Unleash.hs"
+      component: "lib:unleash-client-haskell-core"
+
+    - path: "src/Unleash/HttpClient.hs"
+      component: "lib:unleash-client-haskell-core"
+
+    - path: "src/Unleash/Internal/JsonTypes.hs"
+      component: "lib:unleash-client-haskell-core"
+
+    - path: "src/Unleash/Internal/DomainTypes.hs"
+      component: "lib:unleash-client-haskell-core"

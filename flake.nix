@@ -23,6 +23,7 @@
             haskellPackages.fourmolu
             haskell-language-server
             hlint
+            haskellPackages.implicit-hie
             nixfmt
           ];
           inputsFrom = [ uchc.env ];
