@@ -2,7 +2,6 @@
 
 module Unleash.HttpClient (
     getAllClientFeatures,
-    getVersion,
     sendMetrics,
     register,
 ) where
@@ -14,8 +13,11 @@ import qualified Data.List.NonEmpty as NE
 import Data.Map.Strict (Map, fromListWith)
 import Data.Maybe (fromJust)
 import Data.Proxy (Proxy (..))
-import Data.Text (Text, pack)
+import Data.Text (Text)
+import qualified Data.Text as T
+import Data.Version (showVersion)
 import qualified Network.HTTP.Media as M
+import Paths_unleash_client_haskell_core (version)
 import Servant.API (Accept (contentTypes), Get, Header, JSON, MimeRender (mimeRender), NoContent, PostNoContent, ReqBody, type (:<|>) (..), type (:>))
 import Servant.Client (ClientEnv, ClientError, client, runClientM)
 import Unleash.Internal.DomainTypes (Features, fromJsonFeatures, supportedStrategies)
@@ -80,19 +82,13 @@ sendMetrics clientEnv apiKey metricsPayload = do
             let no = length bools - yes
             YesAndNoes yes no
 
-getVersion :: IO (Maybe Text)
-getVersion = do
-    cabalFile <- readFile "unleash-client-haskell-core.cabal"
-    pure $ fmap pack $ (!! 1) . words <$> (find (isPrefixOf "version") . lines $ cabalFile)
-
 register :: ClientEnv -> Maybe ApiKey -> RegisterPayload -> IO (Either ClientError NoContent)
 register clientEnv apiKey registerPayload = do
-    version <- getVersion
     let fullRegisterPayload =
             FullRegisterPayload
                 { appName = registerPayload.appName,
                   instanceId = registerPayload.instanceId,
-                  sdkVersion = "unleash-client-haskell-core:" <> fromJust version,
+                  sdkVersion = "unleash-client-haskell-core:" <> (T.pack . showVersion) version,
                   strategies = supportedStrategies,
                   started = registerPayload.started,
                   interval = registerPayload.intervalSeconds * 1000

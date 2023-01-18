@@ -46,6 +46,8 @@ library
         Unleash.HttpClient
         Unleash.Internal.JsonTypes
         Unleash.Internal.DomainTypes
+    other-modules:
+        Paths_unleash_client_haskell_core
     hs-source-dirs: src
     build-depends:
         aeson,
@@ -71,7 +73,6 @@ test-suite unleash-client-haskell-core-test
         UnleashHttpClientSpec
         UnleashSpecificationJsonTypes
         UnleashSpecificationSpec
-        VersionSpec
     build-depends:
         unleash-client-haskell-core,
         aeson,
