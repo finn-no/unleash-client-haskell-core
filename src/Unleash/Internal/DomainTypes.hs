@@ -14,7 +14,7 @@ import Data.Hash.Murmur (murmur3)
 import Data.List (find)
 import Data.Map.Strict (Map, fromList)
 import qualified Data.Map.Strict as Map
-import Data.Maybe (catMaybes, fromMaybe, listToMaybe, maybeToList)
+import Data.Maybe (catMaybes, fromMaybe)
 import Data.Text (Text)
 import qualified Data.Text as Text
 import Data.Text.Encoding (encodeUtf8)
@@ -131,7 +131,7 @@ fromJsonFeature segmentMap jsonFeature =
 
 fromJsonStrategy :: MonadIO m => FeatureToggleName -> Map Int [JsonTypes.Constraint] -> JsonTypes.Strategy -> (JsonTypes.Context -> m Bool)
 fromJsonStrategy featureToggleName segmentMap jsonStrategy =
-    \ctx -> liftA2 (&&) (strategyFunction ctx) (constraintsFunction ctx)
+    \ctx -> liftA2 (&&) (strategyFunction ctx) (constraintsPredicate ctx)
     where
         strategyFunction :: MonadIO m => JsonTypes.Context -> m Bool
         strategyFunction =
@@ -210,27 +210,24 @@ fromJsonStrategy featureToggleName segmentMap jsonStrategy =
                 _ -> pure . \_ctx -> False
 
         segmentsToConstraints :: [Int] -> Map Int [JsonTypes.Constraint] -> [Maybe JsonTypes.Constraint]
-        segmentsToConstraints segmentRefs segmentMap =
-            concat $ sequence <$> ((flip Map.lookup) segmentMap <$> segmentRefs)
+        segmentsToConstraints segmentReferences segmentMap =
+            concat $ sequence <$> ((flip Map.lookup) segmentMap <$> segmentReferences)
 
-        constraintsFunction :: MonadIO m => JsonTypes.Context -> m Bool
-        constraintsFunction ctx = do
-            let segmentRefs = concat jsonStrategy.segments
-                segmentConstraints = segmentsToConstraints segmentRefs segmentMap
-                justSegmentConstraints = catMaybes segmentConstraints
-                nothingConstraints =
-                    maybeToList $
-                        listToMaybe $
-                            catMaybes $
-                                ( \maybeConstraints -> case maybeConstraints of
-                                    Nothing -> Just $ const False
-                                    Just _ -> Nothing
-                                )
-                                    <$> segmentConstraints
+        constraintsPredicate :: MonadIO m => JsonTypes.Context -> m Bool
+        constraintsPredicate ctx = do
+            let segmentReferences = concat jsonStrategy.segments
+                maybeSegmentConstraints = segmentsToConstraints segmentReferences segmentMap
+                segmentConstraints = catMaybes maybeSegmentConstraints
                 strategyConstraints = fromMaybe [] jsonStrategy.constraints
-                allConstraints = justSegmentConstraints <> strategyConstraints
-                constraints :: [JsonTypes.Context -> Bool] = (fromJsonConstraint <$> allConstraints) <> nothingConstraints
-            pure $ null constraints || and ((\f -> f ctx) <$> constraints)
+                allConstraints = segmentConstraints <> strategyConstraints
+                allPredicates = fromJsonConstraint <$> allConstraints
+                allSegmentConstraintsAreReferredTo = not $ Nothing `elem` maybeSegmentConstraints
+                allPredicatesAreSatisfied = allSegmentConstraintsAreReferredTo && and (evaluatePredicate <$> allPredicates)
+                thereAreNoPredicates = null allPredicates
+            pure $ thereAreNoPredicates || allPredicatesAreSatisfied
+            where
+                evaluatePredicate :: (JsonTypes.Context -> Bool) -> Bool
+                evaluatePredicate f = f ctx
 
 fromJsonConstraint :: JsonTypes.Constraint -> (JsonTypes.Context -> Bool)
 fromJsonConstraint constraint = \ctx -> do
