@@ -7,11 +7,8 @@ module Unleash.HttpClient (
 ) where
 
 import Data.Aeson (ToJSON, encode)
-import Data.Foldable (find)
-import Data.List (isPrefixOf)
 import qualified Data.List.NonEmpty as NE
 import Data.Map.Strict (Map, fromListWith)
-import Data.Maybe (fromJust)
 import Data.Proxy (Proxy (..))
 import Data.Text (Text)
 import qualified Data.Text as T
