@@ -44,8 +44,9 @@ library
     exposed-modules:
         Unleash
         Unleash.HttpClient
-        Unleash.Internal.JsonTypes
         Unleash.Internal.DomainTypes
+        Unleash.Internal.JsonTypes
+        Unleash.Internal.Predicates
     other-modules:
         Paths_unleash_client_haskell_core
     hs-source-dirs: src
