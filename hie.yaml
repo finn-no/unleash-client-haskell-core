@@ -15,6 +15,9 @@ cradle:
     - path: "test/UnleashSpecificationSpec.hs"
       component: "unleash-client-haskell-core:test:unleash-client-haskell-core-test"
 
+    - path: "example-client/Main.hs"
+      component: "unleash-client-haskell-core:exe:example-client"
+
     - path: "src/Unleash.hs"
       component: "lib:unleash-client-haskell-core"
 

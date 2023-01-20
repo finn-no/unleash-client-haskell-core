@@ -5,6 +5,8 @@ This is the core functionality for an [Unleash](https://www.getunleash.io/) Hask
 - `Unleash`: Data structures and functions for getting features and variants.
 - `Unleash.HttpClient`: HTTP client for interacting with an Unleash server.
 
+An example client can be found in the `example-client` folder.
+
 ## Build
 
 ```
@@ -47,7 +49,5 @@ cabal test
 - versions (BSD-3-Clause)
 
 ## Things to do
-
-- [ ] Create an `unleash-client-haskell-example`.
 
 - [ ] Add project to Hackage and Unleash docs.
