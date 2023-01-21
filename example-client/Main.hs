@@ -1,11 +1,17 @@
 -- Copyright © FINN.no AS, Inc. All rights reserved.
 
+-- Example Unleash client using unleash-client-haskell-core, async and MVars.
+-- Spawns a state poller thread that updates the feature toggles, a metrics
+-- sender thread, and an application that continuously reads a feature toggle.
+-- The application will block until the first feature toggle set is received.
+
 module Main where
 
 import Control.Concurrent (threadDelay)
+import Control.Concurrent.Async (Concurrently (Concurrently, runConcurrently))
 import Control.Concurrent.MVar
-import qualified Control.Concurrent.Thread as Thread (forkIO, result)
 import Control.Monad (forever, void)
+import Data.Foldable (traverse_)
 import Data.Text (Text)
 import qualified Data.Text as T
 import Data.Time (UTCTime, getCurrentTime)
@@ -15,20 +21,24 @@ import Servant.Client (BaseUrl (BaseUrl), ClientEnv, Scheme (Http), mkClientEnv)
 import Unleash
 import Unleash.HttpClient (getAllClientFeatures, register, sendMetrics)
 
+host :: String
+host = "your-unleash-server"
+
+port :: Int
+port = 80
+
+featureToggle :: Text
+featureToggle = "your-feature-toggle"
+
 main :: IO ()
 main = do
     config <- makeConfig
     registerApp config
-    (_, pollWait) <- Thread.forkIO (pollState config)
-    (_, pushWait) <- Thread.forkIO (pushMetrics config)
-    (_, appWait) <- Thread.forkIO (application config)
-    void $ Thread.result =<< pollWait
-    void $ Thread.result =<< pushWait
-    void $ Thread.result =<< appWait
+    let threads = ($ config) <$> [pollState, pushMetrics, application]
+    runConcurrently $ traverse_ Concurrently threads
 
 application :: Config -> IO Void
 application config = do
-    let featureToggle = "your-feature-toggle"
     forever do
         enabled <- isEnabled config featureToggle
         putStrLn $ T.unpack featureToggle <> " is " <> (if enabled then "enabled" else "disabled")
@@ -90,10 +100,8 @@ pushMetrics config = do
 
 makeConfig :: IO Config
 makeConfig = do
-    let host = "your-unleash-server"
-    let port = 80
-    state <- newMVar mempty
-    metrics <- newMVar mempty
+    state <- newEmptyMVar
+    metrics <- newEmptyMVar
     now <- getCurrentTime
     metricsBucketStart <- newMVar now
     manager <- newManager defaultManagerSettings
