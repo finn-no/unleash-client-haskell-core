@@ -12,11 +12,11 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        uchc =
+        unleash-client-haskell-core =
           pkgs.haskellPackages.callCabal2nix "unleash-client-haskell-core" ./.
           { };
       in {
-        defaultPackage = uchc; # nix build .?submodules=1
+        defaultPackage = unleash-client-haskell-core; # nix build .?submodules=1
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
             cabal-install
@@ -26,7 +26,10 @@
             haskellPackages.implicit-hie
             nixfmt
           ];
-          inputsFrom = [ uchc.env ];
+          inputsFrom = [ unleash-client-haskell-core.env ];
+        };
+        overlay = final: prev: {
+          unleash-client-haskell-core = self.defaultPackage.${prev.system};
         };
       });
 }
