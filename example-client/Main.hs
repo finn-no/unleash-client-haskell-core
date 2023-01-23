@@ -44,7 +44,7 @@ application config = do
         putStrLn $ T.unpack featureToggle <> " is " <> (if enabled then "enabled" else "disabled")
         threadDelay $ 2 * 1000 * 1000
 
--- This function will block until the first state has been received from the Unleash server.
+-- This function will block until the first feature toggle set has been received from the Unleash server.
 isEnabled :: Config -> Text -> IO Bool
 isEnabled config featureToggle = do
     state <- readMVar (state config)
