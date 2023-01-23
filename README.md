@@ -31,6 +31,7 @@ cabal test
 
 ## Dependencies
 
+- async (BSD-3-Clause)
 - aeson (BSD-3-Clause)
 - aeson-pretty (BSD-3-Clause)
 - attoparsec (BSD-3-Clause)
