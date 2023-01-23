@@ -4,7 +4,6 @@ name: unleash-client-haskell-core
 version: 0.6.5
 description: Please see README.md
 author: FINN.no
-maintainer: adview@gmail.com
 copyright: Copyright © FINN.no AS, Inc. All rights reserved.
 extra-source-files:
     README.md
