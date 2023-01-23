@@ -10,7 +10,7 @@ module Main where
 import Control.Concurrent (threadDelay)
 import Control.Concurrent.Async (Concurrently (Concurrently, runConcurrently))
 import Control.Concurrent.MVar
-import Control.Monad (forever, void)
+import Control.Monad (forever, unless, void)
 import Data.Foldable (traverse_)
 import Data.Text (Text)
 import qualified Data.Text as T
@@ -44,6 +44,7 @@ application config = do
         putStrLn $ T.unpack featureToggle <> " is " <> (if enabled then "enabled" else "disabled")
         threadDelay $ 2 * 1000 * 1000
 
+-- This function will block until the first state has been received from the Unleash server.
 isEnabled :: Config -> Text -> IO Bool
 isEnabled config featureToggle = do
     state <- readMVar (state config)
@@ -75,8 +76,12 @@ pollState config = do
             Left newState -> putStrLn $ "Could not get state (" <> show newState <> ")"
             Right newState -> do
                 putStrLn "State received"
-                void $ swapMVar (state config) newState
+                updateState (state config) newState
         threadDelay $ (statePollIntervalInSeconds config) * 1000 * 1000
+    where
+        updateState state value = do
+            isUpdated <- tryPutMVar state value
+            unless isUpdated . void $ swapMVar state value
 
 pushMetrics :: Config -> IO Void
 pushMetrics config = do
@@ -101,7 +106,7 @@ pushMetrics config = do
 makeConfig :: IO Config
 makeConfig = do
     state <- newEmptyMVar
-    metrics <- newEmptyMVar
+    metrics <- newMVar mempty
     now <- getCurrentTime
     metricsBucketStart <- newMVar now
     manager <- newManager defaultManagerSettings
