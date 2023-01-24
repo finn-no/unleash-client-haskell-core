@@ -5,7 +5,7 @@ This is the core functionality for an [Unleash](https://www.getunleash.io/) Hask
 - `Unleash`: Data structures and functions for getting features and variants.
 - `Unleash.HttpClient`: HTTP client for interacting with an Unleash server.
 
-An example client can be found in the `example-client` folder.
+See [unleash-client-haskell](https://github.com/finn-no/unleash-client-haskell) for a ready-to-use client.
 
 ## Build
 
@@ -31,7 +31,6 @@ cabal test
 
 ## Dependencies
 
-- async (BSD-3-Clause)
 - aeson (BSD-3-Clause)
 - aeson-pretty (BSD-3-Clause)
 - attoparsec (BSD-3-Clause)
