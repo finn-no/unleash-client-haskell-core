@@ -28,9 +28,5 @@
           ];
           inputsFrom = [ unleash-client-haskell-core.env ];
         };
-        overlay = final: prev: {
-          unleash-client-haskell-core =
-            pkgs.haskell.lib.dontCheck self.defaultPackage.${prev.system};
-        };
       });
 }
