@@ -77,15 +77,3 @@ test-suite unleash-client-haskell-core-test
         http-client,
         servant-client,
         text
-
-executable example-client
-    import: all
-    main-is: Main.hs
-    hs-source-dirs: example-client
-    build-depends:
-        unleash-client-haskell-core,
-        async,
-        http-client,
-        servant-client,
-        text,
-        time
