@@ -6,6 +6,7 @@ module Unleash.HttpClient (
     register,
 ) where
 
+import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Aeson (ToJSON, encode)
 import qualified Data.List.NonEmpty as NE
 import Data.Map.Strict (Map, fromListWith)
@@ -44,14 +45,14 @@ getAllClientFeatures' :<|> sendMetrics' :<|> register' = client api
 
 type ApiKey = Text
 
-getAllClientFeatures :: ClientEnv -> Maybe ApiKey -> IO (Either ClientError Features)
+getAllClientFeatures :: MonadIO m => ClientEnv -> Maybe ApiKey -> m (Either ClientError Features)
 getAllClientFeatures clientEnv apiKey = do
-    eState <- runClientM (getAllClientFeatures' apiKey) clientEnv
+    eState <- liftIO $ runClientM (getAllClientFeatures' apiKey) clientEnv
     pure $ fromJsonFeatures <$> eState
 
-sendMetrics :: ClientEnv -> Maybe ApiKey -> MetricsPayload -> IO (Either ClientError NoContent)
+sendMetrics :: MonadIO m => ClientEnv -> Maybe ApiKey -> MetricsPayload -> m (Either ClientError NoContent)
 sendMetrics clientEnv apiKey metricsPayload = do
-    runClientM (sendMetrics' apiKey fullMetricsPayload) clientEnv
+    liftIO $ runClientM (sendMetrics' apiKey fullMetricsPayload) clientEnv
     where
         fullMetricsPayload :: FullMetricsPayload
         fullMetricsPayload =
@@ -79,7 +80,7 @@ sendMetrics clientEnv apiKey metricsPayload = do
             let no = length bools - yes
             YesAndNoes yes no
 
-register :: ClientEnv -> Maybe ApiKey -> RegisterPayload -> IO (Either ClientError NoContent)
+register :: MonadIO m => ClientEnv -> Maybe ApiKey -> RegisterPayload -> m (Either ClientError NoContent)
 register clientEnv apiKey registerPayload = do
     let fullRegisterPayload =
             FullRegisterPayload
@@ -90,4 +91,4 @@ register clientEnv apiKey registerPayload = do
                   started = registerPayload.started,
                   interval = registerPayload.intervalSeconds * 1000
                 }
-    runClientM (register' apiKey (Just "application/json") fullRegisterPayload) clientEnv
+    liftIO $ runClientM (register' apiKey (Just "application/json") fullRegisterPayload) clientEnv
