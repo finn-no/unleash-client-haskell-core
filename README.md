@@ -47,7 +47,3 @@ cabal test
 - text-show (BSD-3-Clause)
 - time (BSD-2-Clause)
 - versions (BSD-3-Clause)
-
-## Things to do
-
-- [ ] Add project to Hackage and Unleash docs.
