@@ -36,22 +36,16 @@ library
     import: all
     exposed-modules:
         Unleash
-        Unleash.HttpClient
         Unleash.Internal.DomainTypes
         Unleash.Internal.JsonTypes
         Unleash.Internal.Predicates
-    other-modules:
-        Paths_unleash_client_haskell_core
     hs-source-dirs: src
     build-depends:
         aeson,
         containers,
-        http-media,
         murmur3,
         random,
         versions,
-        servant,
-        servant-client,
         text,
         text-show,
         time
@@ -64,7 +58,6 @@ test-suite unleash-client-haskell-core-test
     hs-source-dirs: test
     other-modules:
         UnleashClientSpecificationRoundtripSpec
-        UnleashHttpClientSpec
         UnleashSpecificationJsonTypes
         UnleashSpecificationSpec
     build-depends:
@@ -74,6 +67,4 @@ test-suite unleash-client-haskell-core-test
         attoparsec,
         bytestring,
         hspec,
-        http-client,
-        servant-client,
         text
