@@ -1,9 +1,8 @@
 # unleash-client-haskell-core
 
-This is the core functionality for an [Unleash](https://www.getunleash.io/) Haskell client. It currently meets all [client specifications per v4.2.2](https://github.com/Unleash/client-specification/releases/tag/v4.2.2) and exports:
+This is the core functionality for an [Unleash](https://www.getunleash.io/) Haskell client. It currently meets all [client specifications per v4.2.2](https://github.com/Unleash/client-specification/releases/tag/v4.2.2).
 
-- `Unleash`: Data structures and functions for getting features and variants.
-- `Unleash.HttpClient`: HTTP client for interacting with an Unleash server.
+The `Unleash` module provides data structures and functions for getting features and variants.
 
 See [unleash-client-haskell](https://github.com/finn-no/unleash-client-haskell) for a ready-to-use client.
 
@@ -37,12 +36,8 @@ cabal test
 - bytestring (BSD-3-Clause)
 - containers (BSD-3-Clause)
 - hspec (MIT)
-- http-client (MIT)
-- http-media (MIT)
 - murmur3 (MIT)
 - random (BSD-3-Clause)
-- servant (BSD-3-Clause)
-- servant-client (BSD-3-Clause)
 - text (BSD-2-Clause)
 - text-show (BSD-3-Clause)
 - time (BSD-2-Clause)
