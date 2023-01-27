@@ -2,7 +2,7 @@
 
 This is a library for evaluating [Unleash](https://www.getunleash.io/) feature toggles. It currently meets all [client specifications per v4.2.2](https://github.com/Unleash/client-specification/releases/tag/v4.2.2).
 
-The `Unleash` module provides functions and types for checking feature toggles and variants.
+The `Unleash` module provides functions and types for evaluating feature toggles and variants.
 
 Does not include an HTTP client. See [unleash-client-haskell](https://github.com/finn-no/unleash-client-haskell) for a Haskell Unleash client SDK.
 
