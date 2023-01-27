@@ -1,10 +1,10 @@
 # unleash-client-haskell-core
 
-This library offers core functionality that can be used by [Unleash](https://www.getunleash.io/) clients in Haskell. It currently meets all [client specifications per v4.2.2](https://github.com/Unleash/client-specification/releases/tag/v4.2.2).
+This is a library for evaluating [Unleash](https://www.getunleash.io/) feature toggles. It currently meets all [client specifications per v4.2.2](https://github.com/Unleash/client-specification/releases/tag/v4.2.2).
 
-The `Unleash` module provides data structures and functions for getting features and variants.
+The `Unleash` module provides functions and types for checking feature toggles and variants.
 
-See [unleash-client-haskell](https://github.com/finn-no/unleash-client-haskell) for a ready-to-use client.
+See [unleash-client-haskell](https://github.com/finn-no/unleash-client-haskell) for a ready-to-use Haskell client SDK.
 
 ## Build
 
