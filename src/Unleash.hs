@@ -1,5 +1,11 @@
--- Copyright © FINN.no AS, Inc. All rights reserved.
+{- |
+Module      : Unleash
+Copyright   : Copyright © FINN.no AS, Inc. All rights reserved.
+License     : MIT
+Stability   : experimental
 
+Functions and types for checking feature toggles and variants.
+-}
 module Unleash (
     Features,
     Context (..),
