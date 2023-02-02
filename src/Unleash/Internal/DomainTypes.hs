@@ -1,5 +1,11 @@
--- Copyright © FINN.no AS, Inc. All rights reserved.
+{- |
+Module      : Unleash.Internal.DomainTypes
+Copyright   : Copyright © FINN.no AS, Inc. All rights reserved.
+License     : MIT
+Stability   : experimental
 
+Domain types and evaluation functions.
+-}
 module Unleash.Internal.DomainTypes (
     featureIsEnabled,
     featureGetVariant,
@@ -25,20 +31,32 @@ import Unleash.Internal.JsonTypes (Variant, VariantResponse (..), emptyVariantRe
 import qualified Unleash.Internal.JsonTypes as JsonTypes
 import Unleash.Internal.Predicates (datePredicate, numPredicate, semVerPredicate)
 
+-- | A list of currently supported strategies for this library.
 supportedStrategies :: [Text]
 supportedStrategies = ["default", "userWithId", "gradualRolloutUserId", "gradualRolloutSessionId", "gradualRolloutRandom", "remoteAddress", "flexibleRollout"]
 
+-- | An alias used for feature toggle names (as they are represented on Unleash servers).
 type FeatureToggleName = Text
 
+{- | A map of feature toggles keyed on toggle names.
+ Typically the full set of features fetched from a server.
+-}
 type Features = Map FeatureToggleName Feature
 
+-- | A map of feature toggles keyed on strategy parameters.
 type Parameters = Map Text FeatureToggleName
 
+-- | Feature toggle state getter.
 newtype IsEnabled = IsEnabled (forall m. MonadIO m => JsonTypes.Context -> m Bool)
+
+-- | Feature toggle variant getter.
 newtype GetVariant = GetVariant (forall m. MonadIO m => JsonTypes.Context -> m VariantResponse)
 
+-- | A feature toggle.
 data Feature = Feature
-    { isEnabled :: IsEnabled,
+    { -- | Feature toggle state getter.
+      isEnabled :: IsEnabled,
+      -- | Feature toggle variant getter.
       getVariant :: GetVariant
     }
 
@@ -47,6 +65,7 @@ segmentMap maybeSegments =
     let segments :: [JsonTypes.Segment] = concat maybeSegments
      in fromList $ (\segment -> (segment.id, segment.constraints)) <$> segments
 
+-- | Feature toggle set DTO to domain type converter.
 fromJsonFeatures :: JsonTypes.Features -> Features
 fromJsonFeatures jsonFeatures = fromList $ fmap (fromJsonFeature (segmentMap jsonFeatures.segments)) jsonFeatures.features
 
@@ -316,7 +335,17 @@ getNormalizedNumberN identifier groupId n = do
 getNormalizedNumber :: Text -> Text -> Int
 getNormalizedNumber identifier groupId = getNormalizedNumberN identifier groupId 100
 
-featureIsEnabled :: MonadIO m => Features -> FeatureToggleName -> JsonTypes.Context -> m Bool
+-- | Checks whether or not a feature toggle is enabled.
+featureIsEnabled ::
+    MonadIO m =>
+    -- | A full set of features fetched from a server.
+    Features ->
+    -- | The feature toggle name (as it is represented on the server).
+    FeatureToggleName ->
+    -- | User context.
+    JsonTypes.Context ->
+    -- | Feature toggle state.
+    m Bool
 featureIsEnabled state toggleName ctx = do
     let mToggle :: Maybe Feature = Map.lookup toggleName state
     case mToggle of
@@ -329,7 +358,17 @@ getInt key params = read . Text.unpack $ fromMaybe "0" (Map.lookup key params)
 evaluateStrategy :: (a -> Bool) -> Maybe a -> Bool
 evaluateStrategy f p = maybe False f p
 
-featureGetVariant :: MonadIO m => Features -> FeatureToggleName -> JsonTypes.Context -> m VariantResponse
+-- | Gets a variant for a given feature toggle.
+featureGetVariant ::
+    MonadIO m =>
+    -- | A full set of features fetched from a server.
+    Features ->
+    -- | The feature toggle name (as it is represented on the server).
+    FeatureToggleName ->
+    -- | User context.
+    JsonTypes.Context ->
+    -- | Variant.
+    m VariantResponse
 featureGetVariant state toggleName ctx = do
     let mToggle :: Maybe Feature = Map.lookup toggleName state
     case mToggle of

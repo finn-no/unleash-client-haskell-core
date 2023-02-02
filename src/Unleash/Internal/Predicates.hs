@@ -1,3 +1,11 @@
+{- |
+Module      : Unleash.Internal.Predicates
+Copyright   : Copyright © FINN.no AS, Inc. All rights reserved.
+License     : MIT
+Stability   : experimental
+
+Predicate helpers.
+-}
 module Unleash.Internal.Predicates (
     datePredicate,
     numPredicate,
@@ -13,7 +21,16 @@ import Data.Time.LocalTime (ZonedTime)
 import Data.Versions (SemVer, semver)
 import Text.Read (readMaybe)
 
-datePredicate :: (UTCTime -> UTCTime -> Bool) -> Maybe Text -> Maybe Text -> Bool
+-- | Evaluate a predicate for UTC times.
+datePredicate ::
+    -- | Predicate.
+    (UTCTime -> UTCTime -> Bool) ->
+    -- | First argument to predicate (to be parsed to UTC time).
+    Maybe Text ->
+    -- | Second argument to predicate (to be parsed to UTC time).
+    Maybe Text ->
+    -- | Predicate result.
+    Bool
 datePredicate predicate mCurrentValue mConstraintValue = do
     let parseDate :: Text -> Maybe UTCTime
         parseDate text =
@@ -27,7 +44,16 @@ datePredicate predicate mCurrentValue mConstraintValue = do
         (Just providedDate, Just constraintDate) -> predicate providedDate constraintDate
         _ -> False
 
-numPredicate :: (Double -> Double -> Bool) -> Maybe Text -> Maybe Text -> Bool
+-- | Evaluate a predicate for numbers.
+numPredicate ::
+    -- | Predicate.
+    (Double -> Double -> Bool) ->
+    -- | First argument to predicate (to be parsed to UTC time).
+    Maybe Text ->
+    -- | Second argument to predicate (to be parsed to UTC time).
+    Maybe Text ->
+    -- | Predicate result.
+    Bool
 numPredicate predicate mCurrentValue mConstraintValue = do
     let maybeCurrentValue :: Maybe Double = readMaybe . Text.unpack =<< mCurrentValue
     let maybeConstraintValue :: Maybe Double = readMaybe . Text.unpack =<< mConstraintValue
@@ -36,7 +62,16 @@ numPredicate predicate mCurrentValue mConstraintValue = do
         (Just constraintValue, Just currentValue) -> predicate currentValue constraintValue
         _ -> False
 
-semVerPredicate :: (SemVer -> SemVer -> Bool) -> Maybe Text -> Maybe Text -> Bool
+-- | Evaluate a predicate for semantic versioning values.
+semVerPredicate ::
+    -- | Predicate.
+    (SemVer -> SemVer -> Bool) ->
+    -- | First argument to predicate (to be parsed to a version).
+    Maybe Text ->
+    -- | Second argument to predicate (to be parsed to a version).
+    Maybe Text ->
+    -- | Predicate result.
+    Bool
 semVerPredicate predicate mCurrentValue mConstraintValue = do
     let eitherToMaybe e =
             case e of
