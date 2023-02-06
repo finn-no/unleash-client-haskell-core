@@ -23,6 +23,10 @@ module Unleash.Internal.JsonTypes (
     VariantResponse (..),
     emptyVariantResponse,
     MetricsPayload (..),
+    FullMetricsPayload (..),
+    FullMetricsBucket (..),
+    YesAndNoes (..),
+    FullRegisterPayload (..),
     RegisterPayload (..),
 ) where
 
@@ -187,15 +191,17 @@ data MetricsPayload = MetricsPayload
     }
     deriving stock (Eq, Show, Generic)
 
+-- | Full metrics payload.
 data FullMetricsPayload = FullMetricsPayload
     { appName :: Text,
       instanceId :: Text,
-      bucket :: FullMetricBucket
+      bucket :: FullMetricsBucket
     }
     deriving stock (Eq, Show, Generic)
     deriving anyclass (ToJSON)
 
-data FullMetricBucket = FullMetricBucket
+-- | Full metrics bucket.
+data FullMetricsBucket = FullMetricsBucket
     { -- | Start timestamp for this interval.
       start :: UTCTime,
       -- | End timestamp for this interval.
@@ -206,19 +212,29 @@ data FullMetricBucket = FullMetricBucket
     deriving stock (Eq, Show, Generic)
     deriving anyclass (ToJSON)
 
+-- | Helper data structure for metrics.
 data YesAndNoes = YesAndNoes
-    { yes :: Int,
+    { -- | The number of times the feature toggle was fetched as enabled in an interval.
+      yes :: Int,
+      -- | The number of times the feature toggle was fetched as disabled in an interval.
       no :: Int
     }
     deriving stock (Eq, Show, Generic)
     deriving anyclass (ToJSON)
 
+-- | Full client registration payload.
 data FullRegisterPayload = FullRegisterPayload
-    { appName :: Text,
+    { -- | Application name.
+      appName :: Text,
+      -- | Instance identifier (typically hostname).
       instanceId :: Text,
+      -- | Unleash client SDK version.
       sdkVersion :: Text,
+      -- | Supported strategies.
       strategies :: [Text],
+      -- | When the application was started.
       started :: UTCTime,
+      -- | Expected metrics sending interval.
       interval :: Int
     }
     deriving stock (Eq, Show, Generic)
