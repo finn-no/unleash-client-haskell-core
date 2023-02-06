@@ -15,8 +15,8 @@ module Unleash (
     featureGetVariant,
     MetricsPayload (..),
     RegisterPayload (..),
-    VariantResponse,
+    VariantResponse (..),
 ) where
 
 import Unleash.Internal.DomainTypes (Features, featureGetVariant, featureIsEnabled)
-import Unleash.Internal.JsonTypes (Context (..), MetricsPayload (..), RegisterPayload (..), VariantResponse, emptyContext, emptyVariantResponse)
+import Unleash.Internal.JsonTypes (Context (..), MetricsPayload (..), RegisterPayload (..), VariantResponse (..), emptyContext, emptyVariantResponse)
