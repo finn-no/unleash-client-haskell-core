@@ -9,7 +9,22 @@ Stability   : experimental
 
 Unleash domain transfer objects.
 -}
-module Unleash.Internal.JsonTypes where
+module Unleash.Internal.JsonTypes (
+    Features (..),
+    Feature (..),
+    Strategy (..),
+    Constraint (..),
+    Variant (..),
+    Payload (..),
+    Override (..),
+    Context (..),
+    emptyContext,
+    Segment (..),
+    VariantResponse (..),
+    emptyVariantResponse,
+    MetricsPayload (..),
+    RegisterPayload (..),
+) where
 
 import Data.Aeson (FromJSON, Options (..), ToJSON (toJSON), defaultOptions, genericParseJSON, genericToJSON)
 import Data.Aeson.Types (parseJSON)
@@ -18,7 +33,7 @@ import Data.Text (Text)
 import Data.Time (UTCTime)
 import GHC.Generics (Generic)
 
--- | Feature toggle set DTO.
+-- | Feature toggle set.
 data Features = Features
     { version :: Int,
       features :: [Feature],
@@ -27,7 +42,7 @@ data Features = Features
     deriving stock (Eq, Show, Generic)
     deriving anyclass (FromJSON, ToJSON)
 
--- | Feature toggle DTO.
+-- | Feature toggle.
 data Feature = Feature
     { name :: Text,
       description :: Maybe Text,
@@ -38,9 +53,7 @@ data Feature = Feature
     deriving stock (Eq, Show, Generic)
     deriving anyclass (FromJSON, ToJSON)
 
-{- | Strategy DTO.
- Encompasses all (supported) types of strategies.
--}
+-- | Strategy. Encompasses all (supported) types of strategies.
 data Strategy = Strategy
     { name :: Text,
       parameters :: Maybe (Map Text Text),
@@ -50,7 +63,7 @@ data Strategy = Strategy
     deriving stock (Eq, Show, Generic)
     deriving anyclass (FromJSON, ToJSON)
 
--- | Strategy constraint DTO.
+-- | Strategy constraint.
 data Constraint = Constraint
     { contextName :: Text,
       operator :: Text,
@@ -62,7 +75,7 @@ data Constraint = Constraint
     deriving stock (Eq, Show, Generic)
     deriving anyclass (FromJSON, ToJSON)
 
--- | Variant DTO.
+-- | Variant.
 data Variant = Variant
     { name :: Text,
       payload :: Maybe Payload,
@@ -73,7 +86,6 @@ data Variant = Variant
     deriving stock (Eq, Show, Generic)
     deriving anyclass (FromJSON, ToJSON)
 
--- | A workaround for fields named @type@, which is in conflict with the @type@ keyword.
 typeWorkAroundOptions :: Options
 typeWorkAroundOptions =
     defaultOptions {fieldLabelModifier = typeWorkaround}
@@ -84,9 +96,11 @@ typeWorkAroundOptions =
             "type_" -> "type"
             _ -> s
 
--- | Variant payload DTO.
+-- | Variant payload.
 data Payload = Payload
-    { type_ :: Text,
+    { -- | Payload type.
+      type_ :: Text,
+      -- | Payload.
       value :: Text
     }
     deriving stock (Eq, Show, Generic)
@@ -97,7 +111,7 @@ instance FromJSON Payload where
 instance ToJSON Payload where
     toJSON = genericToJSON typeWorkAroundOptions
 
--- | Override DTO.
+-- | Contextual override.
 data Override = Override
     { contextName :: Text,
       values :: [Text]
@@ -105,7 +119,7 @@ data Override = Override
     deriving stock (Eq, Show, Generic)
     deriving anyclass (FromJSON, ToJSON)
 
--- | Client context DTO.
+-- | Client context.
 data Context = Context
     { -- | User ID.
       userId :: Maybe Text,
@@ -129,7 +143,7 @@ data Context = Context
 emptyContext :: Context
 emptyContext = Context Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
--- | Segment DTO.
+-- | Segment.
 data Segment = Segment
     { id :: Int,
       constraints :: [Constraint]
@@ -137,7 +151,7 @@ data Segment = Segment
     deriving stock (Eq, Show, Generic)
     deriving anyclass (FromJSON, ToJSON)
 
--- | Variant DTO.
+-- | Variant response.
 data VariantResponse = VariantResponse
     { -- | Variant name.
       name :: Text,
@@ -158,7 +172,7 @@ emptyVariantResponse =
           enabled = False
         }
 
--- | Metrics payload DTO subset helper.
+-- | Metrics payload.
 data MetricsPayload = MetricsPayload
     { -- | Application name.
       appName :: Text,
@@ -173,7 +187,6 @@ data MetricsPayload = MetricsPayload
     }
     deriving stock (Eq, Show, Generic)
 
--- | Metrics payload DTO.
 data FullMetricsPayload = FullMetricsPayload
     { appName :: Text,
       instanceId :: Text,
@@ -182,7 +195,6 @@ data FullMetricsPayload = FullMetricsPayload
     deriving stock (Eq, Show, Generic)
     deriving anyclass (ToJSON)
 
--- | Metrics bucket DTO.
 data FullMetricBucket = FullMetricBucket
     { -- | Start timestamp for this interval.
       start :: UTCTime,
@@ -194,17 +206,13 @@ data FullMetricBucket = FullMetricBucket
     deriving stock (Eq, Show, Generic)
     deriving anyclass (ToJSON)
 
--- | Helper data structure for metrics.
 data YesAndNoes = YesAndNoes
-    { -- | The number of times the feature toggle was fetched as enabled in an interval.
-      yes :: Int,
-      -- | The number of times the feature toggle was fetched as disabled in an interval.
+    { yes :: Int,
       no :: Int
     }
     deriving stock (Eq, Show, Generic)
     deriving anyclass (ToJSON)
 
--- | Registration DTO.
 data FullRegisterPayload = FullRegisterPayload
     { appName :: Text,
       instanceId :: Text,
@@ -216,7 +224,7 @@ data FullRegisterPayload = FullRegisterPayload
     deriving stock (Eq, Show, Generic)
     deriving anyclass (ToJSON)
 
--- | Client registration DTO subset helper.
+-- | Client registration payload.
 data RegisterPayload = RegisterPayload
     { -- | Application name.
       appName :: Text,
