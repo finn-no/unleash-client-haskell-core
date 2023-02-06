@@ -7,13 +7,16 @@ Stability   : experimental
 Domain types and evaluation functions.
 -}
 module Unleash.Internal.DomainTypes (
-    featureIsEnabled,
     featureGetVariant,
+    featureIsEnabled,
     fromJsonFeatures,
-    Features,
     supportedStrategies,
+    Feature,
+    Features,
+    FeatureToggleName,
+    GetVariant,
+    IsEnabled,
 ) where
-
 import Control.Applicative (liftA2, (<|>))
 import Control.Monad.IO.Class (MonadIO)
 import Data.Hash.Murmur (murmur3)
