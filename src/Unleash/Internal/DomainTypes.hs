@@ -11,11 +11,11 @@ module Unleash.Internal.DomainTypes (
     featureIsEnabled,
     fromJsonFeatures,
     supportedStrategies,
-    Feature,
+    Feature (..),
     Features,
     FeatureToggleName,
-    GetVariant,
-    IsEnabled,
+    GetVariant (..),
+    IsEnabled (..),
 ) where
 import Control.Applicative (liftA2, (<|>))
 import Control.Monad.IO.Class (MonadIO)
