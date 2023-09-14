@@ -31,7 +31,6 @@ common all
         ScopedTypeVariables
     ghc-options:
         -haddock
-        -O2
         -W
         -Wno-unused-top-binds
         -Wredundant-constraints
