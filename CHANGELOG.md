@@ -1,3 +1,10 @@
+## <small>0.8.9 (2023-09-14)</small>
+
+* Add CHANGELOG.md ([d72bcba](https://github.com/finn-no/unleash-client-haskell-core/commit/d72bcba))
+* Set version to 0.8.9 ([04a0260](https://github.com/finn-no/unleash-client-haskell-core/commit/04a0260))
+
+
+
 ## <small>0.8.8 (2023-09-14)</small>
 
 * Don't do -O2 ([107f9eb](https://github.com/finn-no/unleash-client-haskell-core/commit/107f9eb))
