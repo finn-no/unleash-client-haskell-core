@@ -25,6 +25,7 @@
             hlint
             haskellPackages.implicit-hie
             nixfmt
+            nodePackages.conventional-changelog-cli
           ];
           inputsFrom = [ unleash-client-haskell-core.env ];
         };
