@@ -8,7 +8,7 @@ description:
     The 'Unleash' module provides functions and types for checking feature toggles and variants.
 category: Web
 author: FINN.no
-maintainer: [email protected]
+maintainer: See README.md
 license: MIT
 copyright: Copyright © FINN.no AS, Inc. All rights reserved.
 extra-source-files:
