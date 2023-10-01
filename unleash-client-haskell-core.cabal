@@ -18,25 +18,25 @@ extra-source-files:
 common all
     build-depends:
         base >=4.7 && <5,
-        record-dot-preprocessor >= 0.2.15 && < 0.3,
-        record-hasfield >= 1.0 && < 1.1,
     default-extensions:
         BlockArguments
         DeriveFoldable
         DeriveFunctor
         DeriveTraversable
         DerivingStrategies
+        DuplicateRecordFields
         LambdaCase
+        OverloadedRecordDot
         OverloadedStrings
         RankNTypes
         ScopedTypeVariables
+        TypeApplications
     ghc-options:
         -haddock
         -W
         -Wno-unused-top-binds
         -Wredundant-constraints
         -Wunused-packages
-        -F -pgmF=record-dot-preprocessor
     default-language: Haskell2010
 
 library
@@ -48,14 +48,14 @@ library
         Unleash.Internal.Predicates
     hs-source-dirs: src
     build-depends:
-        aeson >= 2.0.3 && < 2.1,
-        containers >= 0.6.4 && < 0.7,
+        aeson >= 2.1.2 && < 2.2,
+        containers >= 0.6.7 && < 0.7,
         murmur3 >= 1.0.5 && < 1.1,
         random >= 1.2.1 && < 1.3,
-        text >= 1.2.5 && < 1.3,
-        text-show >= 3.9.7 && < 3.10,
-        time >= 1.9.3 && < 1.10,
-        versions >= 5.0.4 && < 5.1,
+        text >= 2.0.2 && < 2.1,
+        text-show >= 3.10.4 && < 3.11,
+        time >= 1.12.2 && < 1.13,
+        versions >= 6.0.1 && < 6.1,
 
 test-suite unleash-client-haskell-core-test
     import: all
@@ -71,7 +71,7 @@ test-suite unleash-client-haskell-core-test
         aeson,
         aeson-pretty >= 0.8.9 && < 0.9,
         attoparsec >= 0.14.4 && < 0.15,
-        bytestring >= 0.10.12 && < 0.11,
-        hspec >= 2.8.5 && < 2.9,
+        bytestring >= 0.11.5 && < 0.12,
+        hspec >= 2.10.10 && < 2.11,
         text,
-        unleash-client-haskell-core
+        unleash-client-haskell-core,
