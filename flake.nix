@@ -6,7 +6,7 @@
       flake = false;
     };
     flake-utils.url = "github:numtide/flake-utils";
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
   };
   outputs = { self, nixpkgs, flake-compat, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
