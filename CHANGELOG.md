@@ -1,3 +1,15 @@
+## <small>0.9.0 (2023-10-13)</small>
+
+* Add homepage ([bc2e162](https://github.com/finn-no/unleash-client-haskell-core/commit/bc2e162))
+* Move CHANGELOG.md to extra-doc-files ([ce63134](https://github.com/finn-no/unleash-client-haskell-core/commit/ce63134))
+* Set version to 0.9.0 ([3212bab](https://github.com/finn-no/unleash-client-haskell-core/commit/3212bab))
+* Update all ([1a4c1ce](https://github.com/finn-no/unleash-client-haskell-core/commit/1a4c1ce))
+* Update CHANGELOG.md ([dff9042](https://github.com/finn-no/unleash-client-haskell-core/commit/dff9042))
+* Update e-mail address ([b059bee](https://github.com/finn-no/unleash-client-haskell-core/commit/b059bee))
+* Use nixos-23.05 ([c667626](https://github.com/finn-no/unleash-client-haskell-core/commit/c667626))
+
+
+
 ## <small>0.8.9 (2023-09-14)</small>
 
 * Add CHANGELOG.md ([d72bcba](https://github.com/finn-no/unleash-client-haskell-core/commit/d72bcba))
