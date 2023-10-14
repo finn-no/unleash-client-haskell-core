@@ -6,6 +6,8 @@ The `Unleash` module provides functions and types for checking feature toggles a
 
 Does not include an HTTP client. See [unleash-client-haskell](https://github.com/finn-no/unleash-client-haskell) for a ready-to-use Haskell Unleash client SDK.
 
+Available on [Hackage](https://hackage.haskell.org/package/unleash-client-haskell-core).
+
 ## Build
 
 ```
