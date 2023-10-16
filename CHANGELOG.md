@@ -1,7 +1,16 @@
-## <small>0.9.0 (2023-10-13)</small>
+## <small>0.10.0 (2023-10-16)</small>
 
 * Add homepage ([bc2e162](https://github.com/finn-no/unleash-client-haskell-core/commit/bc2e162))
 * Move CHANGELOG.md to extra-doc-files ([ce63134](https://github.com/finn-no/unleash-client-haskell-core/commit/ce63134))
+* Set version to 0.10.0 ([2f6ecb9](https://github.com/finn-no/unleash-client-haskell-core/commit/2f6ecb9))
+* Track nixpkgs-unstable ([8654522](https://github.com/finn-no/unleash-client-haskell-core/commit/8654522))
+* Update CHANGELOG ([1047d51](https://github.com/finn-no/unleash-client-haskell-core/commit/1047d51))
+* Update README ([9ac7a94](https://github.com/finn-no/unleash-client-haskell-core/commit/9ac7a94))
+
+
+
+## <small>0.9.0 (2023-10-13)</small>
+
 * Set version to 0.9.0 ([3212bab](https://github.com/finn-no/unleash-client-haskell-core/commit/3212bab))
 * Update all ([1a4c1ce](https://github.com/finn-no/unleash-client-haskell-core/commit/1a4c1ce))
 * Update CHANGELOG.md ([dff9042](https://github.com/finn-no/unleash-client-haskell-core/commit/dff9042))
