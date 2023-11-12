@@ -12,9 +12,7 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        unleash-client-haskell-core =
-          pkgs.haskellPackages.callCabal2nix "unleash-client-haskell-core" ./.
-          { };
+        unleash-client-haskell-core = pkgs.haskellPackages.callCabal2nix "unleash-client-haskell-core" ./. { };
       in {
         defaultPackage = unleash-client-haskell-core; # nix build .?submodules=1
         devShell = pkgs.mkShell {
