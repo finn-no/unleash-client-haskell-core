@@ -7,16 +7,39 @@ Stability   : experimental
 Functions and types for checking feature toggles and variants.
 -}
 module Unleash (
-    Features,
     Context (..),
+    defaultStrategyEvaluator,
+    defaultSupportedStrategies,
     emptyContext,
     emptyVariantResponse,
-    featureIsEnabled,
     featureGetVariant,
+    featureIsEnabled,
+    Features,
+    FeatureToggleName,
     MetricsPayload (..),
     RegisterPayload (..),
+    Strategy (..),
+    StrategyEvaluator,
+    SupportedStrategies,
     VariantResponse (..),
 ) where
 
-import Unleash.Internal.DomainTypes (Features, featureGetVariant, featureIsEnabled)
-import Unleash.Internal.JsonTypes (Context (..), MetricsPayload (..), RegisterPayload (..), VariantResponse (..), emptyContext, emptyVariantResponse)
+import Unleash.Internal.DomainTypes (
+    FeatureToggleName,
+    Features,
+    StrategyEvaluator,
+    defaultStrategyEvaluator,
+    defaultSupportedStrategies,
+    featureGetVariant,
+    featureIsEnabled,
+ )
+import Unleash.Internal.JsonTypes (
+    Context (..),
+    MetricsPayload (..),
+    RegisterPayload (..),
+    Strategy (..),
+    SupportedStrategies,
+    VariantResponse (..),
+    emptyContext,
+    emptyVariantResponse,
+ )

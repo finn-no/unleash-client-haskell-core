@@ -28,6 +28,7 @@ module Unleash.Internal.JsonTypes (
     YesAndNoes (..),
     FullRegisterPayload (..),
     RegisterPayload (..),
+    SupportedStrategies,
 ) where
 
 import Data.Aeson (FromJSON, Options (..), ToJSON (toJSON), defaultOptions, genericParseJSON, genericToJSON)
@@ -231,7 +232,7 @@ data FullRegisterPayload = FullRegisterPayload
       -- | Unleash client SDK version.
       sdkVersion :: Text,
       -- | Supported strategies.
-      strategies :: [Text],
+      strategies :: SupportedStrategies,
       -- | When the application was started.
       started :: UTCTime,
       -- | Expected metrics sending interval.
@@ -246,6 +247,8 @@ data RegisterPayload = RegisterPayload
       appName :: Text,
       -- | Instance identifier (typically hostname).
       instanceId :: Text,
+      -- | Supported strategies.
+      strategies :: SupportedStrategies,
       -- | Client application startup timestamp.
       started :: UTCTime,
       -- | Intended metrics sending interval.
@@ -253,3 +256,6 @@ data RegisterPayload = RegisterPayload
     }
     deriving stock (Eq, Show, Generic)
     deriving anyclass (ToJSON)
+
+-- | Alias for a list of supported strategies.
+type SupportedStrategies = [Text]
