@@ -7,16 +7,19 @@ Stability   : experimental
 Domain types and evaluation functions.
 -}
 module Unleash.Internal.DomainTypes (
+    defaultStrategyEvaluator,
+    defaultSupportedStrategies,
     featureGetVariant,
     featureIsEnabled,
     fromJsonFeatures,
-    supportedStrategies,
     Feature (..),
     Features,
     FeatureToggleName,
     GetVariant (..),
     IsEnabled (..),
+    StrategyEvaluator,
 ) where
+
 import Control.Applicative (liftA2, (<|>))
 import Control.Monad.IO.Class (MonadIO)
 import Data.Hash.Murmur (murmur3)
@@ -35,8 +38,11 @@ import qualified Unleash.Internal.JsonTypes as JsonTypes
 import Unleash.Internal.Predicates (datePredicate, numPredicate, semVerPredicate)
 
 -- | A list of currently supported strategies for this library.
-supportedStrategies :: [Text]
-supportedStrategies = ["default", "userWithId", "gradualRolloutUserId", "gradualRolloutSessionId", "gradualRolloutRandom", "remoteAddress", "flexibleRollout"]
+defaultSupportedStrategies :: JsonTypes.SupportedStrategies
+defaultSupportedStrategies = ["default", "userWithId", "gradualRolloutUserId", "gradualRolloutSessionId", "gradualRolloutRandom", "remoteAddress", "flexibleRollout"]
+
+-- | Functions that implement strategies.
+type StrategyEvaluator = forall m. MonadIO m => JsonTypes.Strategy -> FeatureToggleName -> JsonTypes.Context -> m Bool
 
 -- | Alias used for feature toggle names (as they are represented on Unleash servers).
 type FeatureToggleName = Text
@@ -67,14 +73,14 @@ segmentMap maybeSegments =
      in fromList $ (\segment -> (segment.id, segment.constraints)) <$> segments
 
 -- | Feature toggle set domain transfer object to domain type converter.
-fromJsonFeatures :: JsonTypes.Features -> Features
-fromJsonFeatures jsonFeatures = fromList $ fmap (fromJsonFeature (segmentMap jsonFeatures.segments)) jsonFeatures.features
+fromJsonFeatures :: StrategyEvaluator -> JsonTypes.Features -> Features
+fromJsonFeatures strategyEvaluator jsonFeatures = fromList $ fmap (fromJsonFeature strategyEvaluator (segmentMap jsonFeatures.segments)) jsonFeatures.features
 
 generateRandomText :: MonadIO m => m Text
 generateRandomText = showt <$> randomRIO @Int (0, 99999)
 
-fromJsonFeature :: Map Int [JsonTypes.Constraint] -> JsonTypes.Feature -> (FeatureToggleName, Feature)
-fromJsonFeature segmentMap jsonFeature =
+fromJsonFeature :: StrategyEvaluator -> Map Int [JsonTypes.Constraint] -> JsonTypes.Feature -> (FeatureToggleName, Feature)
+fromJsonFeature strategyEvaluator segmentMap jsonFeature =
     ( jsonFeature.name,
       Feature
         { isEnabled = IsEnabled $ \ctx -> do
@@ -114,7 +120,7 @@ fromJsonFeature segmentMap jsonFeature =
 
         strategyPredicates :: MonadIO m => [JsonTypes.Context -> m Bool]
         strategyPredicates =
-            fmap (fromJsonStrategy jsonFeature.name segmentMap) jsonFeature.strategies
+            fmap (fromJsonStrategy strategyEvaluator jsonFeature.name segmentMap) jsonFeature.strategies
 
         enabledByOverride :: [Variant] -> JsonTypes.Context -> Maybe Variant
         enabledByOverride variants ctx =
@@ -149,89 +155,10 @@ fromJsonFeature segmentMap jsonFeature =
                                   enabled = True
                                 }
 
-fromJsonStrategy :: MonadIO m => FeatureToggleName -> Map Int [JsonTypes.Constraint] -> JsonTypes.Strategy -> (JsonTypes.Context -> m Bool)
-fromJsonStrategy featureToggleName segmentMap jsonStrategy =
-    \ctx -> liftA2 (&&) (strategyFunction ctx) (constraintsPredicate ctx)
+fromJsonStrategy :: MonadIO m => StrategyEvaluator -> FeatureToggleName -> Map Int [JsonTypes.Constraint] -> JsonTypes.Strategy -> (JsonTypes.Context -> m Bool)
+fromJsonStrategy strategyEvaluator featureToggleName segmentMap jsonStrategy =
+    \ctx -> liftA2 (&&) (strategyEvaluator jsonStrategy featureToggleName ctx) (constraintsPredicate ctx)
     where
-        strategyFunction :: MonadIO m => JsonTypes.Context -> m Bool
-        strategyFunction =
-            case jsonStrategy.name of
-                "default" -> pure . \_ctx -> True
-                "userWithId" ->
-                    pure . \ctx ->
-                        let strategy params =
-                                let userIds = maybe [] splitParams (Map.lookup "userIds" params)
-                                 in ctx.userId `elem` (Just <$> userIds)
-                         in evaluateStrategy strategy jsonStrategy.parameters
-                "gradualRolloutUserId" ->
-                    pure . \ctx ->
-                        case ctx.userId of
-                            Nothing -> False
-                            Just userId ->
-                                evaluateStrategy strategy jsonStrategy.parameters
-                                where
-                                    strategy params =
-                                        let percentage = getInt "percentage" params
-                                            groupId = fromMaybe featureToggleName $ Map.lookup "groupId" params
-                                            normValue = getNormalizedNumber userId groupId
-                                         in normValue <= percentage
-                "gradualRolloutSessionId" ->
-                    pure . \ctx ->
-                        case ctx.sessionId of
-                            Nothing -> False
-                            Just sessionId ->
-                                evaluateStrategy strategy jsonStrategy.parameters
-                                where
-                                    strategy params =
-                                        let percentage = getInt "percentage" params
-                                            groupId = fromMaybe featureToggleName $ Map.lookup "groupId" params
-                                            normValue = getNormalizedNumber sessionId groupId
-                                         in normValue <= percentage
-                "gradualRolloutRandom" -> \_ctx -> do
-                    case jsonStrategy.parameters of
-                        Nothing -> pure False
-                        Just params -> do
-                            let percentage = getInt "percentage" params
-                            num <- randomRIO @Int (1, 100)
-                            pure $ percentage >= num
-                "remoteAddress" ->
-                    pure . \ctx ->
-                        let strategy params =
-                                let remoteAddresses = maybe [] splitParams (Map.lookup "IPs" params)
-                                 in ctx.remoteAddress `elem` (Just <$> remoteAddresses)
-                         in evaluateStrategy strategy jsonStrategy.parameters
-                "flexibleRollout" -> \ctx -> do
-                    randomValue <- generateRandomText
-                    let strategy params =
-                            let rollout = getInt "rollout" params
-                                stickiness = fromMaybe "default" $ Map.lookup "stickiness" params
-                                groupId = fromMaybe featureToggleName $ Map.lookup "groupId" params
-                             in case stickiness of
-                                    "default" ->
-                                        normalizedNumber <= rollout
-                                        where
-                                            identifier = fromMaybe randomValue (ctx.userId <|> ctx.sessionId <|> ctx.remoteAddress)
-                                            normalizedNumber = getNormalizedNumber identifier groupId
-                                    "userId" ->
-                                        case ctx.userId of
-                                            Nothing -> False
-                                            Just userId -> getNormalizedNumber userId groupId <= rollout
-                                    "sessionId" ->
-                                        case ctx.sessionId of
-                                            Nothing -> False
-                                            Just sessionId -> getNormalizedNumber sessionId groupId <= rollout
-                                    customField ->
-                                        case lookupContextValue customField ctx of
-                                            Nothing -> False
-                                            Just customValue ->
-                                                getNormalizedNumber customValue groupId <= rollout
-                     in pure $ evaluateStrategy strategy jsonStrategy.parameters
-                -- Unknown strategy
-                _ -> pure . \_ctx -> False
-            where
-                splitParams :: Text -> [Text]
-                splitParams = fmap Text.strip . Text.splitOn ","
-
         segmentsToConstraints :: [Int] -> Map Int [JsonTypes.Constraint] -> [Maybe JsonTypes.Constraint]
         segmentsToConstraints segmentReferences segmentMap =
             concat $ sequence <$> ((flip Map.lookup) segmentMap <$> segmentReferences)
@@ -251,6 +178,86 @@ fromJsonStrategy featureToggleName segmentMap jsonStrategy =
             where
                 evaluatePredicate :: (JsonTypes.Context -> Bool) -> Bool
                 evaluatePredicate f = f ctx
+
+-- | Implementation of default strategies.
+defaultStrategyEvaluator :: StrategyEvaluator
+defaultStrategyEvaluator jsonStrategy featureToggleName =
+    case jsonStrategy.name of
+        "default" -> pure . \_ctx -> True
+        "userWithId" ->
+            pure . \ctx ->
+                let strategy params =
+                        let userIds = maybe [] splitParams (Map.lookup "userIds" params)
+                         in ctx.userId `elem` (Just <$> userIds)
+                 in evaluateStrategy strategy jsonStrategy.parameters
+        "gradualRolloutUserId" ->
+            pure . \ctx ->
+                case ctx.userId of
+                    Nothing -> False
+                    Just userId ->
+                        evaluateStrategy strategy jsonStrategy.parameters
+                        where
+                            strategy params =
+                                let percentage = getInt "percentage" params
+                                    groupId = fromMaybe featureToggleName $ Map.lookup "groupId" params
+                                    normValue = getNormalizedNumber userId groupId
+                                 in normValue <= percentage
+        "gradualRolloutSessionId" ->
+            pure . \ctx ->
+                case ctx.sessionId of
+                    Nothing -> False
+                    Just sessionId ->
+                        evaluateStrategy strategy jsonStrategy.parameters
+                        where
+                            strategy params =
+                                let percentage = getInt "percentage" params
+                                    groupId = fromMaybe featureToggleName $ Map.lookup "groupId" params
+                                    normValue = getNormalizedNumber sessionId groupId
+                                 in normValue <= percentage
+        "gradualRolloutRandom" -> \_ctx -> do
+            case jsonStrategy.parameters of
+                Nothing -> pure False
+                Just params -> do
+                    let percentage = getInt "percentage" params
+                    num <- randomRIO @Int (1, 100)
+                    pure $ percentage >= num
+        "remoteAddress" ->
+            pure . \ctx ->
+                let strategy params =
+                        let remoteAddresses = maybe [] splitParams (Map.lookup "IPs" params)
+                         in ctx.remoteAddress `elem` (Just <$> remoteAddresses)
+                 in evaluateStrategy strategy jsonStrategy.parameters
+        "flexibleRollout" -> \ctx -> do
+            randomValue <- generateRandomText
+            let strategy params =
+                    let rollout = getInt "rollout" params
+                        stickiness = fromMaybe "default" $ Map.lookup "stickiness" params
+                        groupId = fromMaybe featureToggleName $ Map.lookup "groupId" params
+                     in case stickiness of
+                            "default" ->
+                                normalizedNumber <= rollout
+                                where
+                                    identifier = fromMaybe randomValue (ctx.userId <|> ctx.sessionId <|> ctx.remoteAddress)
+                                    normalizedNumber = getNormalizedNumber identifier groupId
+                            "userId" ->
+                                case ctx.userId of
+                                    Nothing -> False
+                                    Just userId -> getNormalizedNumber userId groupId <= rollout
+                            "sessionId" ->
+                                case ctx.sessionId of
+                                    Nothing -> False
+                                    Just sessionId -> getNormalizedNumber sessionId groupId <= rollout
+                            customField ->
+                                case lookupContextValue customField ctx of
+                                    Nothing -> False
+                                    Just customValue ->
+                                        getNormalizedNumber customValue groupId <= rollout
+             in pure $ evaluateStrategy strategy jsonStrategy.parameters
+        -- Unknown strategy
+        _ -> pure . \_ctx -> False
+    where
+        splitParams :: Text -> [Text]
+        splitParams = fmap Text.strip . Text.splitOn ","
 
 fromJsonConstraint :: JsonTypes.Constraint -> (JsonTypes.Context -> Bool)
 fromJsonConstraint constraint = \ctx -> do

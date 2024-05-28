@@ -8,7 +8,7 @@ import Data.Aeson (eitherDecodeFileStrict)
 import Data.Foldable (traverse_)
 import Data.Maybe (fromMaybe)
 import Test.Hspec
-import Unleash.Internal.DomainTypes (featureGetVariant, featureIsEnabled, fromJsonFeatures)
+import Unleash.Internal.DomainTypes (defaultStrategyEvaluator, featureGetVariant, featureIsEnabled, fromJsonFeatures)
 import qualified UnleashSpecificationJsonTypes as JsonTypes
 
 spec :: Spec
@@ -24,7 +24,7 @@ runSpecification :: FilePath -> Expectation
 runSpecification filePath = do
     Right specification <- eitherDecodeFileStrict @JsonTypes.Specification filePath
 
-    let state = fromJsonFeatures specification.state
+    let state = fromJsonFeatures defaultStrategyEvaluator specification.state
 
     let isEnabled' :: JsonTypes.Test -> Expectation
         isEnabled' sut = do
