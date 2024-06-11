@@ -160,7 +160,7 @@ fromJsonStrategy featureToggleName segmentMap jsonStrategy =
                 "userWithId" ->
                     pure . \ctx ->
                         let strategy params =
-                                let userIds = maybe [] (Text.splitOn ", ") (Map.lookup "userIds" params)
+                                let userIds = maybe [] splitParams (Map.lookup "userIds" params)
                                  in ctx.userId `elem` (Just <$> userIds)
                          in evaluateStrategy strategy jsonStrategy.parameters
                 "gradualRolloutUserId" ->
@@ -197,7 +197,7 @@ fromJsonStrategy featureToggleName segmentMap jsonStrategy =
                 "remoteAddress" ->
                     pure . \ctx ->
                         let strategy params =
-                                let remoteAddresses = maybe [] (Text.splitOn ", ") (Map.lookup "IPs" params)
+                                let remoteAddresses = maybe [] splitParams (Map.lookup "IPs" params)
                                  in ctx.remoteAddress `elem` (Just <$> remoteAddresses)
                          in evaluateStrategy strategy jsonStrategy.parameters
                 "flexibleRollout" -> \ctx -> do
@@ -228,6 +228,9 @@ fromJsonStrategy featureToggleName segmentMap jsonStrategy =
                      in pure $ evaluateStrategy strategy jsonStrategy.parameters
                 -- Unknown strategy
                 _ -> pure . \_ctx -> False
+            where
+                splitParams :: Text -> [Text]
+                splitParams = fmap Text.strip . Text.splitOn ","
 
         segmentsToConstraints :: [Int] -> Map Int [JsonTypes.Constraint] -> [Maybe JsonTypes.Constraint]
         segmentsToConstraints segmentReferences segmentMap =
