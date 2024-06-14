@@ -42,7 +42,7 @@ defaultSupportedStrategies :: JsonTypes.SupportedStrategies
 defaultSupportedStrategies = ["default", "userWithId", "gradualRolloutUserId", "gradualRolloutSessionId", "gradualRolloutRandom", "remoteAddress", "flexibleRollout"]
 
 -- | Functions that implement strategies.
-type StrategyEvaluator = forall m. MonadIO m => JsonTypes.Strategy -> FeatureToggleName -> JsonTypes.Context -> m Bool
+type StrategyEvaluator = forall m. (MonadIO m) => JsonTypes.Strategy -> FeatureToggleName -> JsonTypes.Context -> m Bool
 
 -- | Alias used for feature toggle names (as they are represented on Unleash servers).
 type FeatureToggleName = Text
@@ -54,10 +54,10 @@ type Features = Map FeatureToggleName Feature
 type Parameters = Map Text FeatureToggleName
 
 -- | Feature toggle state getter.
-newtype IsEnabled = IsEnabled (forall m. MonadIO m => JsonTypes.Context -> m Bool)
+newtype IsEnabled = IsEnabled (forall m. (MonadIO m) => JsonTypes.Context -> m Bool)
 
 -- | Feature toggle variant getter.
-newtype GetVariant = GetVariant (forall m. MonadIO m => JsonTypes.Context -> m VariantResponse)
+newtype GetVariant = GetVariant (forall m. (MonadIO m) => JsonTypes.Context -> m VariantResponse)
 
 -- | Feature toggle.
 data Feature = Feature
@@ -76,7 +76,7 @@ segmentMap maybeSegments =
 fromJsonFeatures :: StrategyEvaluator -> JsonTypes.Features -> Features
 fromJsonFeatures strategyEvaluator jsonFeatures = fromList $ fmap (fromJsonFeature strategyEvaluator (segmentMap jsonFeatures.segments)) jsonFeatures.features
 
-generateRandomText :: MonadIO m => m Text
+generateRandomText :: (MonadIO m) => m Text
 generateRandomText = showt <$> randomRIO @Int (0, 99999)
 
 fromJsonFeature :: StrategyEvaluator -> Map Int [JsonTypes.Constraint] -> JsonTypes.Feature -> (FeatureToggleName, Feature)
@@ -115,10 +115,10 @@ fromJsonFeature strategyEvaluator segmentMap jsonFeature =
         }
     )
     where
-        anyStrategyEnabled :: MonadIO m => JsonTypes.Context -> m Bool
+        anyStrategyEnabled :: (MonadIO m) => JsonTypes.Context -> m Bool
         anyStrategyEnabled ctx = or <$> traverse (\f -> f ctx) strategyPredicates
 
-        strategyPredicates :: MonadIO m => [JsonTypes.Context -> m Bool]
+        strategyPredicates :: (MonadIO m) => [JsonTypes.Context -> m Bool]
         strategyPredicates =
             fmap (fromJsonStrategy strategyEvaluator jsonFeature.name segmentMap) jsonFeature.strategies
 
@@ -136,7 +136,7 @@ fromJsonFeature strategyEvaluator segmentMap jsonFeature =
                 )
                 variants
 
-        selectVariant :: MonadIO m => [Variant] -> Maybe Text -> Text -> m VariantResponse
+        selectVariant :: (MonadIO m) => [Variant] -> Maybe Text -> Text -> m VariantResponse
         selectVariant variants maybeIdentifier featureName = do
             randomValue <- generateRandomText
             let identifier = fromMaybe randomValue maybeIdentifier
@@ -155,7 +155,7 @@ fromJsonFeature strategyEvaluator segmentMap jsonFeature =
                                   enabled = True
                                 }
 
-fromJsonStrategy :: MonadIO m => StrategyEvaluator -> FeatureToggleName -> Map Int [JsonTypes.Constraint] -> JsonTypes.Strategy -> (JsonTypes.Context -> m Bool)
+fromJsonStrategy :: (MonadIO m) => StrategyEvaluator -> FeatureToggleName -> Map Int [JsonTypes.Constraint] -> JsonTypes.Strategy -> (JsonTypes.Context -> m Bool)
 fromJsonStrategy strategyEvaluator featureToggleName segmentMap jsonStrategy =
     \ctx -> liftA2 (&&) (strategyEvaluator jsonStrategy featureToggleName ctx) (constraintsPredicate ctx)
     where
@@ -163,7 +163,7 @@ fromJsonStrategy strategyEvaluator featureToggleName segmentMap jsonStrategy =
         segmentsToConstraints segmentReferences segmentMap =
             concat $ sequence <$> ((flip Map.lookup) segmentMap <$> segmentReferences)
 
-        constraintsPredicate :: MonadIO m => JsonTypes.Context -> m Bool
+        constraintsPredicate :: (MonadIO m) => JsonTypes.Context -> m Bool
         constraintsPredicate ctx = do
             let segmentReferences = concat jsonStrategy.segments
                 maybeSegmentConstraints = segmentsToConstraints segmentReferences segmentMap
@@ -309,13 +309,13 @@ lookupContextValue key ctx =
             value <- Map.lookup propertiesKey m
             value
 
-isIn :: Eq a => Maybe a -> [a] -> Bool
+isIn :: (Eq a) => Maybe a -> [a] -> Bool
 isIn mCurrentValue values =
     case mCurrentValue of
         Nothing -> False
         Just currentValue -> currentValue `elem` values
 
-isNotIn :: Eq a => Maybe a -> [a] -> Bool
+isNotIn :: (Eq a) => Maybe a -> [a] -> Bool
 isNotIn mCurrentValue values = not $ isIn mCurrentValue values
 
 startsWithAnyOf :: Maybe Text -> [Text] -> Bool
@@ -348,7 +348,7 @@ getNormalizedNumber identifier groupId = getNormalizedNumberN identifier groupId
 
 -- | Check whether or not a feature toggle is enabled.
 featureIsEnabled ::
-    MonadIO m =>
+    (MonadIO m) =>
     -- | Full set of features fetched from a server.
     Features ->
     -- | Feature toggle name (as it is represented on the server).
@@ -371,7 +371,7 @@ evaluateStrategy f p = maybe False f p
 
 -- | Get a variant for a given feature toggle.
 featureGetVariant ::
-    MonadIO m =>
+    (MonadIO m) =>
     -- | Full set of features fetched from a server.
     Features ->
     -- | Feature toggle name (as it is represented on the server).
