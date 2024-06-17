@@ -1,6 +1,9 @@
 # unleash-client-haskell-core
 
-This is a library for evaluating [Unleash](https://www.getunleash.io/) feature toggles. It currently meets all [client specifications per v4.2.2](https://github.com/Unleash/client-specification/releases/tag/v4.2.2).
+This is a library for evaluating [Unleash](https://www.getunleash.io/) feature toggles. It currently meets all client specifications per [v5.0.0](https://github.com/Unleash/client-specification/releases/tag/v5.0.0), except:
+
+- Strategy variants
+- Dependent features
 
 The `Unleash` module provides functions and types for checking feature toggles and variants.
 
