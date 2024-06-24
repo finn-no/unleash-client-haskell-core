@@ -13,19 +13,21 @@ import Data.Attoparsec.ByteString (parseOnly)
 import qualified Data.ByteString as BS (readFile)
 import qualified Data.ByteString.Lazy as BSL
 import Data.Foldable (traverse_)
+import Data.List (isPrefixOf)
 import Test.Hspec
 import UnleashSpecificationJsonTypes (Specification)
 
 spec :: Spec
 spec =
-    describe "Parse JSON specification" do
-        it "parse all specification files and check if input JSON is the same as serialized JSON" do
-            Right allFiles <- eitherDecodeFileStrict @([FilePath]) "./client-specification/specifications/index.json"
+    describe "Parse json specification" do
+        it "parse all specification files and check if input json is the same as serialized json" do
+            Right filepaths <- eitherDecodeFileStrict @([FilePath]) "./client-specification/specifications/index.json"
+
             -- Test 13 contains null as a value that is deleted by WithoutNothing
-            let exclusions = ["13-constraint-operators.json", "16-strategy-variants.json", "17-dependent-features.json"]
-            let files = filter (not . \path -> any ((==) path) exclusions) allFiles
-            let paths = ("./client-specification/specifications/" <>) <$> files
-            traverse_ roundtrip paths
+            let filepathsWO131617 = filter (not . (\x -> isPrefixOf "13" x || isPrefixOf "16" x || isPrefixOf "17" x)) filepaths
+
+            let filepaths' = ("./client-specification/specifications/" <>) <$> filepathsWO131617
+            traverse_ roundtrip filepaths'
 
 roundtrip :: FilePath -> Expectation
 roundtrip filePath = do

@@ -15,11 +15,10 @@ spec :: Spec
 spec =
     describe "Run all specifications" do
         it "run all specification files" do
-            Right allFiles <- eitherDecodeFileStrict @([FilePath]) "./client-specification/specifications/index.json"
-            let exclusions = ["16-strategy-variants.json", "17-dependent-features.json"]
-            let files = filter (not . \path -> any ((==) path) exclusions) allFiles
-            let paths = ("./client-specification/specifications/" <>) <$> files
-            traverse_ runSpecification paths
+            Right filepaths <- eitherDecodeFileStrict @([FilePath]) "./client-specification/specifications/index.json"
+            let filepaths' = ("./client-specification/specifications/" <>) <$> filepaths
+            let implemented = filepaths'
+            traverse_ runSpecification implemented
 
 runSpecification :: FilePath -> Expectation
 runSpecification filePath = do
