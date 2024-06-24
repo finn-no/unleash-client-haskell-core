@@ -24,9 +24,9 @@ spec =
             Right filepaths <- eitherDecodeFileStrict @([FilePath]) "./client-specification/specifications/index.json"
 
             -- Test 13 contains null as a value that is deleted by WithoutNothing
-            let filepathsWO131617 = filter (not . (\x -> isPrefixOf "13" x || isPrefixOf "16" x || isPrefixOf "17" x)) filepaths
+            let filepathsWO13 = filter (not . isPrefixOf "13") filepaths
 
-            let filepaths' = ("./client-specification/specifications/" <>) <$> filepathsWO131617
+            let filepaths' = ("./client-specification/specifications/" <>) <$> filepathsWO13
             traverse_ roundtrip filepaths'
 
 roundtrip :: FilePath -> Expectation
