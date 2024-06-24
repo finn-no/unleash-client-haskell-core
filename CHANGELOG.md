@@ -1,3 +1,15 @@
+## <small>0.11.0 (2024-06-24)</small>
+
+* Handle strategy parameter lists without spaces between values ([88aeb01](https://github.com/finn-no/unleash-client-haskell-core/commit/88aeb01))
+* Pass strategy function ([ffeb9c4](https://github.com/finn-no/unleash-client-haskell-core/commit/ffeb9c4))
+* Refactor Cabal file ([292ce80](https://github.com/finn-no/unleash-client-haskell-core/commit/292ce80))
+* Reformat ([8ce5184](https://github.com/finn-no/unleash-client-haskell-core/commit/8ce5184))
+* Reformat flake.nix ([218de71](https://github.com/finn-no/unleash-client-haskell-core/commit/218de71))
+* Reformat Nix ([d8555ba](https://github.com/finn-no/unleash-client-haskell-core/commit/d8555ba))
+* Update nixpkgs ([a15f64a](https://github.com/finn-no/unleash-client-haskell-core/commit/a15f64a))
+
+
+
 ## <small>0.10.0 (2023-10-16)</small>
 
 * Add homepage ([bc2e162](https://github.com/finn-no/unleash-client-haskell-core/commit/bc2e162))
