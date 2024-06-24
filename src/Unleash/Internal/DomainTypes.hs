@@ -83,9 +83,7 @@ fromJsonFeature :: StrategyEvaluator -> Map Int [JsonTypes.Constraint] -> JsonTy
 fromJsonFeature strategyEvaluator segmentMap jsonFeature =
     ( jsonFeature.name,
       Feature
-        { isEnabled = IsEnabled $ \ctx -> do
-            isAnyStrategyEnabled <- anyStrategyEnabled ctx
-            pure $ jsonFeature.enabled && (null jsonFeature.strategies || isAnyStrategyEnabled),
+        { isEnabled = IsEnabled isEnabled,
           getVariant = GetVariant $ \ctx ->
             if not jsonFeature.enabled
                 then pure emptyVariantResponse
@@ -103,18 +101,26 @@ fromJsonFeature strategyEvaluator segmentMap jsonFeature =
                         Nothing -> do
                             -- Does not have overrides
                             let maybeStickiness = find ("default" /=) . catMaybes $ (.stickiness) <$> variants
-                            case maybeStickiness of
-                                Just stickiness -> do
-                                    -- Has non-default stickiness
-                                    let identifier = lookupContextValue stickiness ctx
-                                    selectVariant variants identifier jsonFeature.name
-                                Nothing -> do
-                                    -- Default stickiness
-                                    let identifier = ctx.userId <|> ctx.sessionId <|> ctx.remoteAddress
-                                    selectVariant variants identifier jsonFeature.name
+                            enabled <- isEnabled ctx
+                            if enabled
+                                then case maybeStickiness of
+                                    Just stickiness -> do
+                                        -- Has non-default stickiness
+                                        let identifier = lookupContextValue stickiness ctx
+                                        selectVariant variants identifier jsonFeature.name
+                                    Nothing -> do
+                                        -- Default stickiness
+                                        let identifier = ctx.userId <|> ctx.sessionId <|> ctx.remoteAddress
+                                        selectVariant variants identifier jsonFeature.name
+                                else pure emptyVariantResponse
         }
     )
     where
+        isEnabled :: (MonadIO m) => JsonTypes.Context -> m Bool
+        isEnabled ctx = do
+            isAnyStrategyEnabled <- anyStrategyEnabled ctx
+            pure $ jsonFeature.enabled && (null jsonFeature.strategies || isAnyStrategyEnabled)
+
         anyStrategyEnabled :: (MonadIO m) => JsonTypes.Context -> m Bool
         anyStrategyEnabled ctx = or <$> traverse (\f -> f ctx) strategyPredicates
 
