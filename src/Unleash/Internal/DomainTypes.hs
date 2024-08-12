@@ -346,7 +346,6 @@ getNormalizedNumberN :: Text -> Text -> Word32 -> Int
 getNormalizedNumberN identifier groupId n = do
     let s = groupId <> ":" <> identifier
     let hash :: Word32 = murmur3 (0 :: Word32) $ encodeUtf8 s
-
     fromIntegral $ (mod hash n) + 1
 
 getNormalizedNumber :: Text -> Text -> Int
