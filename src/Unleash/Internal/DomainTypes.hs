@@ -20,7 +20,7 @@ module Unleash.Internal.DomainTypes (
     StrategyEvaluator,
 ) where
 
-import Control.Applicative (liftA2, (<|>))
+import Control.Applicative ((<|>))
 import Control.Monad.IO.Class (MonadIO)
 import Data.Hash.Murmur (murmur3)
 import Data.List (find)
