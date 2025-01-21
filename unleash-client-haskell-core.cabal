@@ -1,6 +1,6 @@
 cabal-version:      3.0
 name:               unleash-client-haskell-core
-version:            0.11.0
+version:            0.12.0
 synopsis:           Unleash feature toggle client core
 description:
   This is a library for evaluating [Unleash](https://www.getunleash.io/) feature toggles.
