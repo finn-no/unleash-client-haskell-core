@@ -1,3 +1,14 @@
+## <small>0.12.0 (2025-01-21)</small>
+
+* Add source-repository ([70fe283](https://github.com/finn-no/unleash-client-haskell-core/commit/70fe283))
+* client-specification: v5.0.0 ([8e28782](https://github.com/finn-no/unleash-client-haskell-core/commit/8e28782))
+* Format Cabal file ([e1479d3](https://github.com/finn-no/unleash-client-haskell-core/commit/e1479d3))
+* Tidy up ([b4718a1](https://github.com/finn-no/unleash-client-haskell-core/commit/b4718a1))
+* Update CHANGELOG ([660c81a](https://github.com/finn-no/unleash-client-haskell-core/commit/660c81a))
+* Update Nixpkgs ([dcf0002](https://github.com/finn-no/unleash-client-haskell-core/commit/dcf0002))
+
+
+
 ## <small>0.11.0 (2024-06-24)</small>
 
 * Handle strategy parameter lists without spaces between values ([88aeb01](https://github.com/finn-no/unleash-client-haskell-core/commit/88aeb01))
