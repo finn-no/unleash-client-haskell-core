@@ -15,6 +15,10 @@ copyright: Copyright © FINN.no AS, Inc. All rights reserved.
 extra-doc-files: CHANGELOG.md
 extra-source-files: README.md
 
+source-repository head
+  type: git
+  location: https://github.com/finn-no/unleash-client-haskell-core
+
 common all
     default-extensions:
         BlockArguments
