@@ -28,11 +28,6 @@ nix-shell
 cabal test
 ```
 
-## Maintainers
-
-- [Even Brenden](mailto:uch@anythingexternal.com)
-- [Eirik Meland](mailto:eirik.meland@gmail.com)
-
 ## Dependencies
 
 - aeson (BSD-3-Clause)
