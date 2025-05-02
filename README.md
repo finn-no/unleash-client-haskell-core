@@ -11,6 +11,8 @@ Does not include an HTTP client. See [unleash-client-haskell](https://github.com
 
 Available on [Hackage](https://hackage.haskell.org/package/unleash-client-haskell-core).
 
+This project is currently unmaintained.
+
 ## Build
 
 ```
